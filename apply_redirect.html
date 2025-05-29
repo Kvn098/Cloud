@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Redirecting...</title>
+  <script>
+    let redirected = false;
+
+    async function loadJob() {
+      if (redirected) return;
+
+      try {
+        const res = await fetch("job_data.json?_=" + Date.now());
+        const { jobId, scheduleId } = await res.json();
+
+        if (jobId && scheduleId) {
+          const target = `https://hiring.amazon.ca/application/ca/?CS=true&locale=en-CA&jobId=${jobId}&scheduleId=${scheduleId}&ssoEnabled=1`;
+          redirected = true;
+
+          // Immediately clear the file (fire-and-forget)
+          fetch("clear.json", { method: "POST" }).catch(() => {});
+
+          window.location.href = target;
+        } else {
+          document.body.textContent = "Waiting for job data...";
+        }
+      } catch (err) {
+        document.body.textContent = "Waiting for job_data.json...";
+      }
+
+      if (!redirected) setTimeout(loadJob, 200); // faster polling
+    }
+
+    loadJob();
+  </script>
+</head>
+<body>
+  <p>Waiting for job shift...</p>
+</body>
+</html>
