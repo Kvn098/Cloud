@@ -7,13 +7,12 @@ GRAPHQL_URL = "https://e5mquma77feepi2bdn4d6h3mpu.appsync-api.us-east-1.amazonaw
 LOCATION_LAT = 43.7315
 LOCATION_LNG = -79.7624
 
-def load_token():
-    with open("token.txt", "r") as f:
-        return f.read().strip()
-
 def build_headers():
+    token = os.getenv("SESSION_TOKEN")
+    if not token:
+        raise ValueError("SESSION_TOKEN environment variable not set.")
     return {
-        "Authorization": load_token(),
+        "Authorization": f"Bearer Status|logged-in|{token}",
         "Content-Type": "application/json",
         "Origin": "https://hiring.amazon.ca",
         "Referer": "https://hiring.amazon.ca/",
