@@ -1,11 +1,9 @@
 import asyncio
 import httpx
-import json
 import os
+import json
 
 GRAPHQL_URL = "https://e5mquma77feepi2bdn4d6h3mpu.appsync-api.us-east-1.amazonaws.com/graphql"
-HOME_RECEIVER_URL = "http://<YOUR_PC_IP>:5000/apply"  # Change this if hosted
-
 LOCATION_LAT = 43.7315
 LOCATION_LNG = -79.7624
 
@@ -81,9 +79,10 @@ def build_schedule_query(job_id):
     }
 
 async def send_to_home(job_id, schedule_id):
+    home_url = os.getenv("HOME_RECEIVER_URL", "http://localhost:5000/apply")
     try:
         async with httpx.AsyncClient() as client:
-            res = await client.post(HOME_RECEIVER_URL, json={"jobId": job_id, "scheduleId": schedule_id})
+            res = await client.post(home_url, json={"jobId": job_id, "scheduleId": schedule_id})
             print(f"[🚀] Sent to home: {job_id} | {schedule_id} | {res.status_code}")
     except Exception as e:
         print(f"[❌] Failed to send: {e}")
